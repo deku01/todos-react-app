@@ -1,71 +1,135 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState} from 'react';
-import { StyleSheet, View, Text,FlatList,TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  TextInput,
+} from 'react-native';
 import Constants from 'expo-constants';
 import Icon from 'react-native-vector-icons/AntDesign';
 import CheckIcon from 'react-native-vector-icons/MaterialIcons';
 
 const App = () => {
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const [dummyData,setData] = useState([{
-    id: "1",
-    title: 'First Item',
-    check: false,
-  },
-  {
-    id: "2",
-    title: 'Second Item',
-    check: false,
-  },
-  {
-    id: "3",
-    title: 'Third Item',
-    check: false,
-  },]);
-  
-  const toggleFunction= (id) => {
-    const myVar = dummyData.map((e)=>{
-      if(e.id===id){
-        return {...e, check: !e.check}
+  const [text, setText] = useState('');
+
+  const [dummyData, setData] = useState([
+    {
+      id: '1',
+      title: 'First Item',
+      check: false,
+    },
+    {
+      id: '2',
+      title: 'Second Item',
+      check: false,
+    },
+    {
+      id: '3',
+      title: 'Third Item',
+      check: false,
+    },
+  ]);
+
+  const toggleFunction = (id) => {
+    const myVar = dummyData.map((e) => {
+      if (e.id === id) {
+        return { ...e, check: !e.check };
       } else {
-        return {...e}
+        return { ...e };
       }
-    })
+    });
     setData(myVar);
-  }
+  };
 
-  const Item = ({ title,check,id }) => (
+  const Item = ({ title, check, id }) => (
     <View style={styles.item}>
       <TouchableOpacity onPress={() => toggleFunction(id)}>
-        {check ? <Icon size={30} name="checkcircleo" /> : <CheckIcon size={35} color="grey" name="radio-button-unchecked" />}
+        {check ? (
+          <Icon size={30} name="checkcircleo" />
+        ) : (
+          <CheckIcon size={30} color="grey" name="radio-button-unchecked" />
+        )}
       </TouchableOpacity>
       <Text style={styles.content}>{title}</Text>
     </View>
   );
 
   const renderItem = ({ item }) => (
-    <Item title={item.title} 
-          check={item.check}
-          id={item.id}
-     />
+    <Item title={item.title} check={item.check} id={item.id} />
   );
 
-  return (  
-  <>
-    <StatusBar />
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.text}>Today</Text>
-         <Icon size={30} color="blue" name="pluscircleo" />
+  const addTodoItem = (text) => {
+    setData([...dummyData,{ id: Math.random().toString(36).substring(7), title: text, check: false }])
+  }
+
+
+  return (
+    <>
+      <StatusBar />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.text}>Today</Text>
+          <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
+            <Icon size={30} color="blue" name="pluscircleo" />
+          </TouchableOpacity>
+        </View>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Add Todo</Text>
+              <TextInput
+                style={styles.inputField}
+                
+                onChangeText={text => setText(text)}
+                value={text}
+                placeholder=""
+              />
+              <View
+                style={{
+                  width: 175,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {addTodoItem(text)
+                   setModalVisible(false)
+                   setText('') 
+                  }}
+                  >
+                  <Text style={styles.textStyle}>Add</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <FlatList
+          data={dummyData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
       </View>
-      <FlatList
-        data={dummyData}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-    </View>
-  </>
-  )
+    </>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -75,24 +139,73 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 15,
-    alignItems:'center',
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   item: {
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "flex-start",
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    borderBottomWidth:1,
+    borderBottomWidth: 1,
   },
   content: {
     padding: 10,
-    fontSize:16,
   },
   text: {
     fontSize: 30,
-    fontWeight:"bold",
+    fontWeight: 'bold',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  inputField: {
+    height: 150,
+    width: 150,
+    borderColor: 'gray',
+    marginBottom: 10,
+    padding: 10,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 1,
   },
 });
 

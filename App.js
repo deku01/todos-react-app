@@ -9,6 +9,7 @@ import {
   Modal,
   Pressable,
   TextInput,
+  Alert,
 } from 'react-native';
 import Constants from 'expo-constants';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -57,7 +58,7 @@ const App = () => {
           <CheckIcon size={30} color="grey" name="radio-button-unchecked" />
         )}
       </TouchableOpacity>
-      <Text style={styles.content}>{title}</Text>
+      <Text style={check ? styles.checkedContent : styles.content}>{title}</Text>
     </View>
   );
 
@@ -66,7 +67,11 @@ const App = () => {
   );
 
   const addTodoItem = (text) => {
-    setData([...dummyData,{ id: Math.random().toString(36).substring(7), title: text, check: false }])
+    if(text.trim().length > 0){
+      setData([...dummyData,{ id: Math.random().toString(36).substring(7), title: text.trim(), check: false }])
+    } else {
+      alert("Empty Todo list not allowed");
+    }
   }
 
 
@@ -99,7 +104,7 @@ const App = () => {
               />
               <View
                 style={{
-                  width: 175,
+                  width: 225,
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                 }}>
@@ -153,6 +158,10 @@ const styles = StyleSheet.create({
   content: {
     padding: 10,
   },
+  checkedContent: {
+    padding: 10,
+    textDecorationLine: "line-through",
+  },
   text: {
     fontSize: 30,
     fontWeight: 'bold',
@@ -167,7 +176,8 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: 35,
+    padding: 10,
+    width:275,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -199,7 +209,7 @@ const styles = StyleSheet.create({
   },
   inputField: {
     height: 150,
-    width: 150,
+    width: 225,
     borderColor: 'gray',
     marginBottom: 10,
     padding: 10,

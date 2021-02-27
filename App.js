@@ -14,6 +14,9 @@ import {
 import Constants from 'expo-constants';
 import Icon from 'react-native-vector-icons/AntDesign';
 import CheckIcon from 'react-native-vector-icons/MaterialIcons';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 
 const App = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -37,6 +40,46 @@ const App = () => {
       check: false,
     },
   ]);
+
+  function AllScreen() {
+  return (
+    <>
+    <View>
+        <FlatList
+          data={dummyData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+    </View>
+    </>
+  );
+}
+
+function CompletedScreen() {
+  return (
+    <View>
+        <FlatList
+          data={dummyData.filter(e => e.check!==false)}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+    </View>
+  );
+}
+
+function RemainingScreen() {
+  return (
+    <View>
+        <FlatList
+          data={dummyData.filter(e => e.check===false)}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+    </View>
+  );
+}
+
+const Tab = createBottomTabNavigator();
 
   const toggleFunction = (id) => {
     const myVar = dummyData.map((e) => {
@@ -127,11 +170,16 @@ const App = () => {
             </View>
           </View>
         </Modal>
-        <FlatList
-          data={dummyData}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
+        
+    <NavigationContainer>
+      <Tab.Navigator
+      tabBarOptions={{
+    labelStyle: { fontSize:16,justifyContent:'center',textAlign:'center' },}}>
+        <Tab.Screen name="All" component={AllScreen} />
+        <Tab.Screen name="Completed" component={CompletedScreen} />
+        <Tab.Screen name="Remaining" component={RemainingScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
       </View>
     </>
   );

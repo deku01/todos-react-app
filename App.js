@@ -16,12 +16,17 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import CheckIcon from 'react-native-vector-icons/MaterialIcons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import DatePicker from 'react-native-datepicker';
+import { TextInputMask } from 'react-native-masked-text';
+import moment from 'moment';
 
 
 const App = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [text, setText] = useState('');
+
+  const [date, setDate] = useState();
 
   const [dummyData, setData] = useState([
     {
@@ -138,13 +143,27 @@ const Tab = createBottomTabNavigator();
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text style={styles.modalText}>Add Todo</Text>
-              <TextInput
-                style={styles.inputField}
-                
-                onChangeText={text => setText(text)}
-                value={text}
-                placeholder=""
-              />
+              <View style={styles.addTodo}>
+                <TextInput
+                  style={styles.inputField}
+                  onChangeText={(text) => setText(text)}
+                  value={text}
+                  placeholder="Todo item"
+                />
+                <DatePicker
+                  style={styles.dueDate}
+                  showIcon={false}
+                  date={date}
+                  mode="date"
+                  placeholder="Due Date:"
+                  format="DD-MM-YYYY"
+                  confirmBtnText="Chọn"
+                  cancelBtnText="Hủy"
+                  onDateChange={(date) => {
+                    setDate(date);
+                  }}
+                />
+              </View>
               <View
                 style={{
                   width: 225,
@@ -159,27 +178,32 @@ const Tab = createBottomTabNavigator();
 
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={() => {addTodoItem(text)
-                   setModalVisible(false)
-                   setText('') 
-                  }}
-                  >
+                  onPress={() => {
+                    addTodoItem(text);
+                    setModalVisible(false);
+                    setText('');
+                  }}>
                   <Text style={styles.textStyle}>Add</Text>
                 </Pressable>
               </View>
             </View>
           </View>
         </Modal>
-        
-    <NavigationContainer>
-      <Tab.Navigator
-      tabBarOptions={{
-    labelStyle: { fontSize:16,justifyContent:'center',textAlign:'center' },}}>
-        <Tab.Screen name="All" component={AllScreen} />
-        <Tab.Screen name="Completed" component={CompletedScreen} />
-        <Tab.Screen name="Remaining" component={RemainingScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+
+        <NavigationContainer>
+          <Tab.Navigator
+            tabBarOptions={{
+              labelStyle: {
+                fontSize: 16,
+                justifyContent: 'center',
+                textAlign: 'center',
+              },
+            }}>
+            <Tab.Screen name="All" component={AllScreen} />
+            <Tab.Screen name="Completed" component={CompletedScreen} />
+            <Tab.Screen name="Remaining" component={RemainingScreen} />
+          </Tab.Navigator>
+        </NavigationContainer>
       </View>
     </>
   );
@@ -208,7 +232,7 @@ const styles = StyleSheet.create({
   },
   checkedContent: {
     padding: 10,
-    textDecorationLine: "line-through",
+    textDecorationLine: 'line-through',
   },
   text: {
     fontSize: 30,
@@ -225,7 +249,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 10,
-    width:275,
+    width: 275,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -255,12 +279,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  inputField: {
+  addTodo: {
     height: 150,
     width: 225,
     borderColor: 'gray',
     marginBottom: 10,
     padding: 10,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  inputField: {
+    height: 75,
+    width: 200,
+    textAlign: 'center',
+    borderColor: 'gray',
+    marginBottom: 10,
+    padding: 10,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  dueDate: {
+    width:200,
+    backgroundColor: 'white',
+    borderColor: 'gray',
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 1,
